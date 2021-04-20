@@ -73,35 +73,62 @@ fi
 if [ -f "/tmp/dotrebledata" ]; then
   rm /tmp/dotrebledata
   ui_print "[i] Starting Treble repartition by shrinking data..."
-  userdata_partline=`sgdisk --print /dev/block/mmcblk0 | grep -i userdata`
-  userdata_partnum_current=$(echo "$userdata_partline" | awk '{ print $1 }')
-  userdata_partstart_current=$(echo "$userdata_partline" | awk '{ print $2 }')
-  userdata_partend_current=$(echo "$userdata_partline" | awk '{ print $3 }')
+  ui_print "[#] Unmounting all eMMC partitions..."
+  	unmountAllAndRefreshPartitions
+  	userdata_partline=`sgdisk --print /dev/block/mmcblk0 | grep -i userdata`
+  	userdata_partnum_current=$(echo "$userdata_partline" | awk '{ print $1 }')
+  	userdata_partstart_current=$(echo "$userdata_partline" | awk '{ print $2 }')
+  	userdata_partend_current=$(echo "$userdata_partline" | awk '{ print $3 }')
   ui_print "[#] Shrinking userdata..."
-  sgdisk /dev/block/mmcblk0 --delete $userdata_partnum_current
-  sgdisk /dev/block/mmcblk0 --new=$userdata_partnum_current:$userdata_treble_partstart:$userdata_partend_current
-  sgdisk /dev/block/mmcblk0 --change-name=$userdata_partnum_current:userdata
+  	sgdisk /dev/block/mmcblk0 --delete $userdata_partnum_current
+  	sgdisk /dev/block/mmcblk0 --new=$userdata_partnum_current:$userdata_treble_partstart:$userdata_partend_current
+  	sgdisk /dev/block/mmcblk0 --change-name=$userdata_partnum_current:userdata
   ui_print "[#] Creating vendor_a..."
-  sgdisk /dev/block/mmcblk0 --new=$vendor_a_partnum:$vendor_a_partstart_userdata:$vendor_a_partend_userdata
-  sgdisk /dev/block/mmcblk0 --change-name=$vendor_a_partnum:vendor_a
+  	sgdisk /dev/block/mmcblk0 --new=$vendor_a_partnum:$vendor_a_partstart_userdata:$vendor_a_partend_userdata
+  	sgdisk /dev/block/mmcblk0 --change-name=$vendor_a_partnum:vendor_a
   ui_print "[#] Creating vendor_b..."
-  sgdisk /dev/block/mmcblk0 --new=$vendor_b_partnum:$vendor_b_partstart_userdata:$vendor_b_partend_userdata
-  sgdisk /dev/block/mmcblk0 --change-name=$vendor_b_partnum:vendor_b
-  sleep 2
-  blockdev --rereadpt /dev/block/mmcblk0
-  sleep 1
-  userdata_new_partlength_sectors=$((userdata_partend_current-userdata_treble_partstart))
+  	sgdisk /dev/block/mmcblk0 --new=$vendor_b_partnum:$vendor_b_partstart_userdata:$vendor_b_partend_userdata
+  	sgdisk /dev/block/mmcblk0 --change-name=$vendor_b_partnum:vendor_b
+  	sleep 2
+  	blockdev --rereadpt /dev/block/mmcblk0
+  	sleep 1
+  	userdata_new_partlength_sectors=$((userdata_partend_current-userdata_treble_partstart))
   ui_print "[i] Userdata sectors: $userdata_new_partlength_sectors"
-  userdata_new_partlength_bytes=$((userdata_new_partlength_sectors*512))
+  	userdata_new_partlength_bytes=$((userdata_new_partlength_sectors*512))
   ui_print "[i] Userdata bytes: $userdata_new_partlength_bytes"
-  userdata_new_ext4size=$((userdata_new_partlength_bytes-16384))
+  	userdata_new_ext4size=$((userdata_new_partlength_bytes-16384))
   ui_print "[i] Userdata new size noef: $userdata_new_ext4size"
   ui_print "[#] Formatting userdata..."
-  make_ext4fs -a /data -l $userdata_new_ext4size /dev/block/mmcblk0p$userdata_partnum_current
+  	sleep 2
+  	umount -f /data > /dev/null 2>&1
+  	sleep 2
+  	blockdev --rereadpt /dev/block/mmcblk0
+  	sleep 2
+  	mke2fs -F -F -t ext4 -b 4096 /dev/block/mmcblk0p$userdata_partnum_current
+  	sleep 2
+  	e2fsdroid -e -S /file_contexts -a /data /dev/block/mmcblk0p$userdata_partnum_current
+  	sleep 2
   ui_print "[#] Formatting vendor_a and vendor_b..."
-  sleep 2
-  make_ext4fs /dev/block/mmcblk0p$vendor_a_partnum
-  make_ext4fs /dev/block/mmcblk0p$vendor_b_partnum
+  	mke2fs -F -F -t ext4 -b 4096 /dev/block/mmcblk0p$vendor_a_partnum 153600
+  	sleep 2
+  	e2fsdroid -e -S /file_contexts -a /vendor /dev/block/mmcblk0p$vendor_a_partnum
+  	sleep 2
+  	mke2fs -F -F -t ext4 -b 4096 /dev/block/mmcblk0p$vendor_b_partnum 153600
+  	sleep 2
+  	e2fsdroid -e -S /file_contexts -a /vendor /dev/block/mmcblk0p$vendor_b_partnum
+  	sleep 2
+  ui_print "[#] Formatting system_a and system_b..."
+	sleep 2
+	blockdev --rereadpt /dev/block/mmcblk0
+	sleep 1
+	mke2fs -t ext4 -b 4096 /dev/block/mmcblk0p$system_a_partnum
+	sleep 2
+	e2fsdroid -e -S /file_contexts -a / /dev/block/mmcblk0p$system_a_partnum
+	sleep 2
+	mke2fs -t ext4 -b 4096 /dev/block/mmcblk0p$system_b_partnum
+	sleep 2
+	e2fsdroid -e -S /file_contexts -a / /dev/block/mmcblk0p$system_b_partnum
+	 sleep 2
   ui_print "[i] All done!"
   ui_print "[i] You are now ready to install a any ROM (non-Treble or Treble) and/or Vendor pack."
 fi
@@ -110,29 +137,45 @@ fi
 if [ -f "/tmp/remtrebledata" ]; then
   rm /tmp/remtrebledata
   ui_print "[i] Starting repartition back to stock..."
+  ui_print "[#] Unmounting all eMMC partitions..."
+  	unmountAllAndRefreshPartitions
   ui_print "[#] Deleting vendor_a..."
-  sgdisk /dev/block/mmcblk0 --delete $vendor_a_partnum
+  	sgdisk /dev/block/mmcblk0 --delete $vendor_a_partnum
   ui_print "[#] Deleting vendor_b..."
-  sgdisk /dev/block/mmcblk0 --delete $vendor_b_partnum
-  sleep 1
-  blockdev --rereadpt /dev/block/mmcblk0
-  sleep 0.5
-  userdata_partline=`sgdisk --print /dev/block/mmcblk0 | grep -i userdata`
-  userdata_partnum_current=$(echo "$userdata_partline" | awk '{ print $1 }')
-  userdata_partstart_current=$(echo "$userdata_partline" | awk '{ print $2 }')
-  userdata_partend_current=$(echo "$userdata_partline" | awk '{ print $3 }')
+  	sgdisk /dev/block/mmcblk0 --delete $vendor_b_partnum
+  	sleep 1
+  	blockdev --rereadpt /dev/block/mmcblk0
+  	sleep 0.5
+  	userdata_partline=`sgdisk --print /dev/block/mmcblk0 | grep -i userdata`
+  	userdata_partnum_current=$(echo "$userdata_partline" | awk '{ print $1 }')
+  	userdata_partstart_current=$(echo "$userdata_partline" | awk '{ print $2 }')
+  	userdata_partend_current=$(echo "$userdata_partline" | awk '{ print $3 }')
   ui_print "[#] Growing userdata..."
-  sgdisk /dev/block/mmcblk0 --delete $userdata_partnum
-  sgdisk /dev/block/mmcblk0 --new=$userdata_partnum:$userdata_stock_partstart:$userdata_partend_current
-  sgdisk /dev/block/mmcblk0 --change-name=$userdata_partnum:userdata
+  	sgdisk /dev/block/mmcblk0 --delete $userdata_partnum
+  	sgdisk /dev/block/mmcblk0 --new=$userdata_partnum:$userdata_stock_partstart:$userdata_partend_current
+  	sgdisk /dev/block/mmcblk0 --change-name=$userdata_partnum:userdata
   ui_print "[#] Formatting userdata..."
-  sleep 2
-  blockdev --rereadpt /dev/block/mmcblk0
-  sleep 1
-  userdata_new_partlength_sectors=`echo $((userdata_partend_current-userdata_stock_partstart))`
-  userdata_new_partlength_bytes=`echo $((userdata_new_partlength_sectors*512))`
-  userdata_new_ext4size=`echo $((userdata_new_partlength_bytes-16384))`
-  make_ext4fs -a /data -l $userdata_new_ext4size /dev/block/mmcblk0p$userdata_partnum_current
+  	sleep 2
+  	umount -f /data > /dev/null 2>&1
+  	sleep 2
+  	blockdev --rereadpt /dev/block/mmcblk0
+  	sleep 2
+  	mke2fs -F -F -t ext4 -b 4096 /dev/block/mmcblk0p$userdata_partnum_current
+  	sleep 2
+  	e2fsdroid -e -S /file_contexts -a /data /dev/block/mmcblk0p$userdata_partnum_current
+  	sleep 2
+  ui_print "[#] Formatting system_a and system_b..."
+	sleep 2
+	blockdev --rereadpt /dev/block/mmcblk0
+	sleep 1
+	mke2fs -t ext4 -b 4096 /dev/block/mmcblk0p$system_a_partnum
+	sleep 2
+	e2fsdroid -e -S /file_contexts -a / /dev/block/mmcblk0p$system_a_partnum
+	sleep 2
+	mke2fs -t ext4 -b 4096 /dev/block/mmcblk0p$system_b_partnum
+	sleep 2
+	e2fsdroid -e -S /file_contexts -a / /dev/block/mmcblk0p$system_b_partnum
+	sleep 2
   ui_print "[i] All done!"
   ui_print "[i] You are now ready to install a non-Treble ROM or restore from a ROM backup."
 fi
