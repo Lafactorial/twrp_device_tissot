@@ -22,6 +22,11 @@ It was released in September 2017.
 | Front Camera               | 5 MP                              |
 | Release Date               | September 2017                    |
 
+## Build recovery installer
+https://gerrit.omnirom.org/c/android_build/+/33182
+
+## Exclude TWRP app
+https://gerrit.omnirom.org/c/android_bootable_recovery/+/27694
 
 ## Compile
 
