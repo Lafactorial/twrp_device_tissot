@@ -452,6 +452,8 @@ static int boot_ctl_set_active_slot_for_partitions(vector<string> part_list,
 		}
 		memset(active_guid, '\0', sizeof(active_guid));
 		memset(inactive_guid, '\0', sizeof(inactive_guid));
+		// [CosmicDan] Disable the active check; we force the requested slot active instead
+		/*
 		if (get_partition_attribute(slotA, ATTR_SLOT_ACTIVE) == 1) {
 			//A is the current active slot
 			memcpy((void*)active_guid, (const void*)pentryA,
@@ -469,8 +471,15 @@ static int boot_ctl_set_active_slot_for_partitions(vector<string> part_list,
 			ALOGE("Both A & B are inactive..Aborting");
 			goto error;
 		}
+		*/
 		if (!strncmp(slot_suffix_arr[slot], AB_SLOT_A_SUFFIX,
 					strlen(AB_SLOT_A_SUFFIX))){
+			// [CosmicDan] force setting A active and B inactive
+			memcpy((void*)active_guid, (const void*)pentryA,
+					TYPE_GUID_SIZE);
+			memcpy((void*)inactive_guid,(const void*)pentryB,
+					TYPE_GUID_SIZE);
+			ALOGE("Forced setting Slot A as active [CosmicDan Treble fix]");
 			//Mark A as active in primary table
 			UPDATE_SLOT(pentryA, active_guid, SLOT_ACTIVE);
 			//Mark A as active in backup table
@@ -481,6 +490,12 @@ static int boot_ctl_set_active_slot_for_partitions(vector<string> part_list,
 			UPDATE_SLOT(pentryB_bak, inactive_guid, SLOT_INACTIVE);
 		} else if (!strncmp(slot_suffix_arr[slot], AB_SLOT_B_SUFFIX,
 					strlen(AB_SLOT_B_SUFFIX))){
+			// [CosmicDan] force setting B active and A inactive
+			memcpy((void*)active_guid, (const void*)pentryB,
+					TYPE_GUID_SIZE);
+			memcpy((void*)inactive_guid, (const void*)pentryA,
+					TYPE_GUID_SIZE);
+			ALOGE("Forced setting Slot B as active [CosmicDan Treble fix]");
 			//Mark B as active in primary table
 			UPDATE_SLOT(pentryB, active_guid, SLOT_ACTIVE);
 			//Mark B as active in backup table
@@ -562,10 +577,7 @@ int set_active_boot_slot(struct boot_control_module *module, unsigned slot)
 	for (map_iter = ptn_map.begin(); map_iter != ptn_map.end(); map_iter++){
 		if (map_iter->second.size() < 1)
 			continue;
-		if (boot_ctl_set_active_slot_for_partitions(map_iter->second, slot)) {
-			ALOGE("%s: Failed to set active slot for partitions ", __func__);;
-			goto error;
-		}
+		boot_ctl_set_active_slot_for_partitions(map_iter->second, slot);
 	}
 	if (is_ufs) {
 		if (!strncmp(slot_suffix_arr[slot], AB_SLOT_A_SUFFIX,
