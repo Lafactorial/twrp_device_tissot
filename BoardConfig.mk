@@ -116,6 +116,7 @@ TARGET_RECOVERY_WIPE := $(LOCAL_PATH)/recovery/root/etc/recovery.wipe
 BOARD_SUPPRESS_SECURE_ERASE := true
 BOARD_ROOT_EXTRA_FOLDERS := firmware persist
 BOARD_USES_RECOVERY_AS_BOOT := true
+TW_PREPARE_DATA_MEDIA_EARLY := true
 
 # TWRP Debug Flags
 #TWRP_EVENT_LOGGING := true
