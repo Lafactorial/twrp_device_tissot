@@ -1,4 +1,4 @@
-#!/sbin/sh
+#!/system/bin/sh
 
 ### Recovery service bootstrap for better Treble support
 # Purpose:
@@ -27,7 +27,7 @@ fi;
 ln -s /dev/block/mmcblk0 /dev/mmcblk0
 
 # start recovery
-/sbin/recovery &
+/system/bin/recovery &
 
 # idle around
 while kill -0 `pidof recovery`; do sleep 1; done

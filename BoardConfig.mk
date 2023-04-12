@@ -40,8 +40,6 @@ TARGET_NO_BOOTLOADER := true
 # Crypto
 TW_INCLUDE_CRYPTO := true
 TARGET_HW_DISK_ENCRYPTION := true
-PLATFORM_VERSION := 16.1.0
-PLATFORM_SECURITY_PATCH := 2099-12-31
 
 # GPT Utils
 BOARD_PROVIDES_GPTUTILS := true
@@ -73,7 +71,7 @@ TARGET_COPY_OUT_VENDOR := vendor
 # Recovery
 BOARD_HAS_REMOVABLE_STORAGE := true
 BOARD_HAS_LARGE_FILESYSTEM := true
-TARGET_RECOVERY_WIPE := $(LOCAL_PATH)/recovery/root/etc/recovery.wipe
+TARGET_RECOVERY_WIPE := $(LOCAL_PATH)/recovery/root/system/etc/recovery.wipe
 BOARD_SUPPRESS_SECURE_ERASE := true
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
 BOARD_ROOT_EXTRA_FOLDERS := firmware persist
@@ -125,3 +123,11 @@ RECOVERY_INSTALLER_PATH := bootable/recovery/installer
 
 # Decryption
 BOARD_USES_QCOM_FBE_DECRYPTION := true
+
+TW_OVERRIDE_SYSTEM_PROPS := \
+    "ro.build.date.utc;ro.build.product;ro.build.fingerprint=ro.system.build.fingerprint;ro.build.version.incremental;ro.product.device=ro.product.system.device;ro.product.model=ro.product.system.model;ro.product.name=ro.product.system.name"
+
+PLATFORM_VERSION := 127
+PLATFORM_SECURITY_PATCH := 2127-12-31
+PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
+VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)

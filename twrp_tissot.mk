@@ -15,9 +15,9 @@
 #
 
 # Inherit some common Omni stuff.
-$(call inherit-product, vendor/omni/config/common.mk)
+$(call inherit-product, vendor/twrp/config/common.mk)
 
-$(call inherit-product, build/target/product/embedded.mk)
+$(call inherit-product, build/target/product/aosp_base.mk)
 
 # Inherit from device configuration
 $(call inherit-product, device/xiaomi/tissot/device.mk)
@@ -31,7 +31,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 ## Device identifier. This must come after all inclusions
 PRODUCT_DEVICE := tissot
-PRODUCT_NAME := omni_tissot
+PRODUCT_NAME := twrp_tissot
 PRODUCT_BRAND := Xiaomi
 PRODUCT_MODEL := Mi A1
 PRODUCT_MANUFACTURER := Xiaomi

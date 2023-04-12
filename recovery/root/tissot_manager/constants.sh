@@ -1,4 +1,4 @@
-#!/sbin/sh
+#!/system/bin/sh
 
 # Common constants for all scripts
 

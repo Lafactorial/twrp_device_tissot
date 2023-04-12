@@ -1,4 +1,4 @@
-#!/sbin/sh
+#!/system/bin/sh
 # Tissot Manager install script by CosmicDan, edited by Giovix92
 # Parts based on AnyKernel2 Backend by osm0sis
 #
@@ -22,7 +22,7 @@ ui_print() {
 show_progress() { echo "progress $1 $2" > $OUTFD; }
 set_progress() { echo "set_progress $1" > $OUTFD; }
 
-getprop() { test -e /sbin/getprop && /sbin/getprop $1 || file_getprop /default.prop $1; }
+getprop() { test -e /system/bin/getprop && /system/bin/getprop $1 || file_getprop /default.prop $1; }
 abort() { ui_print "$*"; umount /system; umount /data; exit 1; }
 
 ######

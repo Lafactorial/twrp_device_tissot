@@ -1,4 +1,4 @@
-#!/sbin/sh
+#!/system/bin/sh
 
 # Various tools for Tissot TWRP by CosmicDan
 # Parts from LazyFlasher boot image patcher script by jcadduono
@@ -80,7 +80,7 @@ isHotBoot() {
 }
 
 isModdedUpdateEngine() {
-	if [ -f "/sbin/update_engine_sideload_cosmicmod" ]; then
+	if [ -f "/system/bin/update_engine_sideload_cosmicmod" ]; then
 		# remember: 0 = true with return codes
 		return 0
 	else
@@ -527,7 +527,7 @@ doEncryptionPatch() {
 }
 
 unmountAllAndRefreshPartitions() {
-	stop sbinqseecomd
+	stop system/binqseecomd
 	sleep 1
 	kill `pidof qseecomd`
 	mount | grep /dev/block/mmcblk0p | while read -r line ; do

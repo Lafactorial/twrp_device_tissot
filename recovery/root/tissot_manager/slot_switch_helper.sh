@@ -1,4 +1,4 @@
-#!/sbin/sh
+#!/system/bin/sh
 # 
 
 if [ -b "/dev/block/bootdevice/by-name/userdata_$1" ]; then

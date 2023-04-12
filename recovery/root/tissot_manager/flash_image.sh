@@ -1,4 +1,4 @@
-#!/sbin/sh
+#!/system/bin/sh
 ### flash_image script
 
 # only source it, we set our own OUT_FD

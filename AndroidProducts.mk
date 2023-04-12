@@ -15,4 +15,4 @@
 #
 
 PRODUCT_MAKEFILES := \
-	$(LOCAL_DIR)/omni_tissot.mk
+	$(LOCAL_DIR)/twrp_tissot.mk
