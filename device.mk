@@ -36,19 +36,13 @@ PRODUCT_PACKAGES += \
 # Boot control
 PRODUCT_PACKAGES += \
     android.hardware.boot@1.0-impl \
+    android.hardware.boot@1.0-impl.recovery \
     android.hardware.boot@1.0-service \
     bootctrl.$(TARGET_BOARD_PLATFORM) \
+    bootctrl.$(TARGET_BOARD_PLATFORM).recovery
 
 PRODUCT_PACKAGES_DEBUG += \
     bootctl
-
-# Enable update engine sideloading by including the static version of the
-# boot_control HAL and its dependencies.
-PRODUCT_STATIC_BOOT_CONTROL_HAL := \
-    bootctrl.$(TARGET_BOARD_PLATFORM) \
-    libcutils \
-    libgptutils \
-    libz
 
 # Update engine
 PRODUCT_PACKAGES += \
