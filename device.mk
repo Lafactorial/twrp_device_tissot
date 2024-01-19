@@ -62,17 +62,13 @@ PRODUCT_PACKAGES += \
 # Boot control
 PRODUCT_PACKAGES += \
     android.hardware.boot@1.0-impl \
+    android.hardware.boot@1.0-impl.recovery \
     android.hardware.boot@1.0-service \
-    bootctrl.msm8953 \
+    bootctrl.$(TARGET_BOARD_PLATFORM) \
+    bootctrl.$(TARGET_BOARD_PLATFORM).recovery
 
 PRODUCT_PACKAGES_DEBUG += \
     bootctl
-
-PRODUCT_STATIC_BOOT_CONTROL_HAL := \
-    bootctrl.msm8953 \
-    libcutils \
-    libgptutils \
-    libz
 
 # Update engine
 PRODUCT_PACKAGES += \
