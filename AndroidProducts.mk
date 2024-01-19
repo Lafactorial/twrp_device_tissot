@@ -16,7 +16,7 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/twrp_mido.mk
+    $(LOCAL_DIR)/twrp_tissot.mk
 
 COMMON_LUNCH_CHOICES := \
-    twrp_mido-eng
+    twrp_tissot-eng
