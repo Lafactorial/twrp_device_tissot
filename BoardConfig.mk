@@ -46,6 +46,10 @@ BOARD_PROVIDES_GPTUTILS := true
 # Bootctrl
 BOARD_PROVIDES_BOOTCTRL := true
 
+# Build env.
+ALLOW_MISSING_DEPENDENCIES := true
+BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
+
 # Kernel
 BOARD_KERNEL_BASE := 0x80000000
 BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom msm_rtb.filter=0x237 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 androidboot.bootdevice=7824900.sdhci earlycon=msm_hsl_uart,0x78af000
@@ -83,6 +87,7 @@ TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 TW_NO_SCREEN_BLANK := true
 TARGET_RECOVERY_QCOM_RTC_FIX := true
 TW_DEFAULT_BRIGHTNESS := 85
+TW_MAX_BRIGHTNESS := 255
 TW_EXCLUDE_DEFAULT_USB_INIT := true
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
 TW_EXTRA_LANGUAGES := true
