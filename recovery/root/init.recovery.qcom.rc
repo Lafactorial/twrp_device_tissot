@@ -27,13 +27,18 @@
 
 import /init.recovery.qcom_decrypt.rc
 
+on init
+    exec u:r:recovery:s0 -- /system/bin/resetprop ro.boot.verifiedbootstate orange
+
 on fs
-    wait /dev/block/platform/soc/${ro.boot.bootdevice}
+    write /sys/kernel/sdhci_msm/add_host 1
+	wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
     export ANDROID_ROOT /system_root
 
 on boot
     mkdir /firmware
+    wait /dev/block/platform/soc/7824900.sdhci/by-name/modem
     mount vfat /dev/block/bootdevice/by-name/modem /firmware ro
     start qseecomd
     exec u:r:recovery:s0 -- /system/bin/sleep 1s
@@ -48,3 +53,10 @@ on boot
     write /sys/bus/cpu/devices/cpu5/online 0
     write /sys/bus/cpu/devices/cpu6/online 0
     write /sys/bus/cpu/devices/cpu7/online 0
+	
+on property:ro.boot.bootdevice=7864900.sdhci
+    exec u:r:recovery:s0 -- /system/bin/resetprop ro.gsid.image_running 1
+	
+# Decryption
+on init
+    exec u:r:recovery:s0 -- /system/bin/detect-fbe.sh
